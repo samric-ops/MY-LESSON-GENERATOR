@@ -3,7 +3,7 @@ import google.generativeai as genai
 from fpdf import FPDF
 
 # 1. SETUP - Replace with your key from Google AI Studio
-API_KEY = AIzaSyBOw7hs_Vb65ILCD-LD7B2K5Egf1HEWzOQ
+API_KEY = "AIzaSyBOw7hs_Vb65ILCD-LD7B2K5Egf1HEWzOQ"
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
