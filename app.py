@@ -12,7 +12,8 @@ except:
 
 genai.configure(api_key=API_KEY)
 
-# Using 'gemini-1.5-flash' is correct, but we'll add error handling 
+# Change from 'gemini-1.5-flash' to 'gemini-1.5-flash-latest'
+model = genai.GenerativeModel('gemini-1.5-flash-latest') 
 # just in case the model isn't responding.
 model = genai.GenerativeModel('gemini-1.5-flash')
 
