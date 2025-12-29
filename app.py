@@ -2,20 +2,24 @@ import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
 
-# 1. SETUP 
-# We use st.secrets for security. I will show you how to set this up below.
+# --- VERSION CHECKER (Start) ---
+# This prints the library version at the top of your app
+st.write(f"🔍 Diagnostic: Google GenAI Version: {genai.__version__}")
+# If this number is less than 0.7.0, Streamlit is ignoring your requirements.txt!
+# --- VERSION CHECKER (End) ---
+
+# 1. SETUP
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    # Fallback for local testing if secrets aren't set
-    API_KEY = "AIzaSyC1UcmdhtoPqY2MIkFhncP07qDuocn5Db4" 
+    # Use your specific key if secrets fail
+    API_KEY = "AIzaSyC1UcmdhtoPqY2MIkFhncP07qDuocn5Db4"
 
 genai.configure(api_key=API_KEY)
 
-# Use 'gemini-pro' (the 1.0 version) which works on almost all library versions
-model = genai.GenerativeModel('gemini-pro') 
-# just in case the model isn't responding.
-model = genai.GenerativeModel('gemini-1.5-flash')
+# We are switching to 'gemini-pro' because it is the most stable model 
+# and works even if the library version is slightly old.
+model = genai.GenerativeModel('gemini-pro')
 
 st.set_page_config(page_title="DLL/DLP Generator", page_icon="📋")
 st.title("📋 Daily Lesson Plan (DLP) Generator")
@@ -34,18 +38,13 @@ if st.button("Generate Lesson Plan"):
             try:
                 full_prompt = f"""
                 Create a detailed Daily Lesson Plan (DLP) for {topic}, Grade {grade_level}, Quarter {quarter}.
-                Use the following EXACT format and headers:
-
+                Use the following EXACT format:
                 1. HEADER: Subject Area, Grade Level, Quarter, Date.
-                2. CURRICULUM CONTENT: Content Standard, Performance Standard, Learning Competencies/Objectives.
-                3. CONTENT: The specific topic title.
-                4. INTEGRATION: Within and Across.
-                5. LEARNING RESOURCES: Teacher Guide, Learner Materials.
-                6. TEACHING AND LEARNING PROCEDURE:
-                   - Activating Prior Knowledge
-                   - Establishing Lesson Purpose
-                   - Developing Understanding
-                   - Lesson Activity
+                2. CURRICULUM CONTENT.
+                3. CONTENT.
+                4. INTEGRATION.
+                5. LEARNING RESOURCES.
+                6. TEACHING AND LEARNING PROCEDURE.
                 7. MAKING GENERALIZATION.
                 8. EVALUATING LEARNING.
                 9. ASSIGNMENT.
@@ -57,29 +56,21 @@ if st.button("Generate Lesson Plan"):
                 lesson_text = response.text
                 
                 st.markdown("### Preview")
-                st.info("Lesson generated successfully!")
                 st.write(lesson_text)
 
                 # 3. CONVERT TO PDF
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=10)
-                
-                # Clean text: remove characters that FPDF doesn't support
                 clean_text = lesson_text.encode('latin-1', 'ignore').decode('latin-1')
-                
-                # Add content to PDF
                 pdf.multi_cell(0, 8, clean_text)
                 
-                pdf_filename = f"Lesson_Plan_{topic.replace(' ', '_')}.pdf"
-                pdf_output = pdf.output(dest='S').encode('latin-1') # Stream to memory
-
+                pdf_output = pdf.output(dest='S').encode('latin-1')
                 st.download_button(
                     label="💾 Download as PDF",
                     data=pdf_output,
-                    file_name=pdf_filename,
+                    file_name="Lesson_Plan.pdf",
                     mime="application/pdf"
                 )
             except Exception as e:
-                st.error(f"An error occurred: {e}")
-                st.info("Try checking if your API Key is active in Google AI Studio.")
+                st.error(f"Error: {e}")
