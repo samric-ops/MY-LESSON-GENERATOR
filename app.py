@@ -12,8 +12,8 @@ except:
 
 genai.configure(api_key=API_KEY)
 
-# Change from 'gemini-1.5-flash' to 'gemini-1.5-flash-latest'
-model = genai.GenerativeModel('gemini-1.5-flash-latest') 
+# Use 'gemini-pro' (the 1.0 version) which works on almost all library versions
+model = genai.GenerativeModel('gemini-pro') 
 # just in case the model isn't responding.
 model = genai.GenerativeModel('gemini-1.5-flash')
 
