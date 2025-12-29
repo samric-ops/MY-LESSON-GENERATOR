@@ -8,7 +8,7 @@ try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
     # Fallback for local testing if secrets aren't set
-    API_KEY = "AIzaSyBOw7hs_Vb65ILCD-LD7B2K5Egf1HEWzOQ" 
+    API_KEY = "AIzaSyC1UcmdhtoPqY2MIkFhncP07qDuocn5Db4" 
 
 genai.configure(api_key=API_KEY)
 
