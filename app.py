@@ -2,24 +2,25 @@ import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
 
-# --- VERSION CHECKER (Start) ---
-# This prints the library version at the top of your app
+# --- DIAGNOSTIC ---
+# This confirms you are on the correct version (should be 0.8.6+)
 st.write(f"🔍 Diagnostic: Google GenAI Version: {genai.__version__}")
-# If this number is less than 0.7.0, Streamlit is ignoring your requirements.txt!
-# --- VERSION CHECKER (End) ---
 
 # 1. SETUP
+# ---------------------------------------------------------
+# IMPORTANT: PASTE YOUR NEW API KEY BELOW inside the quotes
+# ---------------------------------------------------------
 try:
+    # Try loading from secrets first
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    # Use your specific key if secrets fail
-    API_KEY = "AIzaSyC1UcmdhtoPqY2MIkFhncP07qDuocn5Db4"
+    # PASTE YOUR NEW KEY HERE REPLACE THE OLD ONE
+    API_KEY = "AIzaSyC1UcmdhtoPqY2MIkFhncP07qDuocn5Db4" 
 
 genai.configure(api_key=API_KEY)
 
-# We are switching to 'gemini-pro' because it is the most stable model 
-# and works even if the library version is slightly old.
-model = genai.GenerativeModel('gemini-pro')
+# Now that you have library version 0.8.6, we use the specific modern model
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 st.set_page_config(page_title="DLL/DLP Generator", page_icon="📋")
 st.title("📋 Daily Lesson Plan (DLP) Generator")
@@ -62,10 +63,13 @@ if st.button("Generate Lesson Plan"):
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=10)
+                # Clean text to prevent crashes
                 clean_text = lesson_text.encode('latin-1', 'ignore').decode('latin-1')
                 pdf.multi_cell(0, 8, clean_text)
                 
+                # Output to memory string (S) for Streamlit download
                 pdf_output = pdf.output(dest='S').encode('latin-1')
+                
                 st.download_button(
                     label="💾 Download as PDF",
                     data=pdf_output,
@@ -74,3 +78,4 @@ if st.button("Generate Lesson Plan"):
                 )
             except Exception as e:
                 st.error(f"Error: {e}")
+                st.info("Double check that you replaced the API Key in the code with a NEW one from Google AI Studio.")
